@@ -1,4 +1,4 @@
-# Article submitted to DEMOGRAPHIC RESEARCH journal
+# Article submitted to RELAP journal
 - Submission date:
 - Publication date:
 - Article link:
