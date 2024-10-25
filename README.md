@@ -1,4 +1,4 @@
-# Article submitted to RELAP journal
+# Article submitted to CSP - Cadernos de Saúde Pública journal
 - Submission date:
 - Publication date:
 - Article link:
