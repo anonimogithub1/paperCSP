@@ -90,17 +90,17 @@ figura1 = df5 %>%
   ggplot(aes(x = factor(df5$`Grupo etário`, levels = c("25 a 29 anos", "30 a 34 anos", "35 a 39 anos",
                                                        "40 a 44 anos", "45 a 49 anos", "50 a 54 anos",
                                                        "55 a 59 anos" ),
-                        labels = c("1", "2", "3", "4", "5", "6", "7")),
+                        labels = c("25-29", "30-34", "35-39", "40-44", "45-49", "50-54", "55-59")),
              y = `log_mx_média`, color = `Level of education`)) + 
   geom_line(aes(group = `Level of education`, linetype = "Point estimate")) +
   geom_line(aes(y = log_mx_LI, group = `Level of education`, linetype = "Lower limit and Upper limit")) +
   geom_line(aes(y = log_mx_LS, group = `Level of education`, linetype = "Lower limit and Upper limit")) +
   facet_grid(Sex ~ Region) +
-  theme(legend.position="bottom") +
+  theme(legend.position="bottom", axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1)) +
   labs(y = "Log(mx)", x = "Age group ", color = "Level of education", linetype = "") +
   guides(linetype = guide_legend(order = 2), color = guide_legend(order = 1))
 
-  ggsave(plot = figura1, "figuras/Figura 1.png", width=7, height=4, dpi=300)
+  ggsave(plot = figura1, "figuras/Figura 1.eps", width=7, height=4, dpi=300)
 
 ############# Tabelas de sobrevivência (apenas nqx e lx) ###################
 
@@ -180,51 +180,7 @@ RRfinal <- RRfinal %>%
          )
 
 
-# Por IDADE (Figura 2 do repositório)
-
-figura2 = ggplot(RRfinal, aes(x = factor(RRfinal$`Grupo etário`, levels = c("25 a 29 anos", "30 a 34 anos", "35 a 39 anos",
-                                                              "40 a 44 anos", "45 a 49 anos", "50 a 54 anos",
-                                                              "55 a 59 anos" ),
-                               labels = c("1", "2", "3", "4", "5", "6", "7")), y = RR_média)) +
-  geom_col(position = position_dodge(width=0.9)) +
-  geom_errorbar(aes(ymin = RR_LI, ymax = RR_LS), position = position_dodge(width=0.9), width = 0.25) +
-  facet_grid(Sex ~ Region) +
-  labs(x = "Age group", y = "Risc Ratio (RR)")
-
-  ggsave(plot = figura2, "figuras/Figura 2.png", width=6, height=4, dpi=300)
-
-# Por SEXO (Figura 3 do repositório)
-
-figura3 = ggplot(RRfinal, aes(x = factor(RRfinal$`Grupo etário`, levels = c("25 a 29 anos", "30 a 34 anos", "35 a 39 anos",
-                                                              "40 a 44 anos", "45 a 49 anos", "50 a 54 anos",
-                                                              "55 a 59 anos" ),
-                               labels = c("1", "2", "3", "4", "5", "6", "7")), y = RR_média, fill = Sex)) +
-  geom_col(position = position_dodge(width=0.9)) +
-  geom_errorbar(aes(ymin = RR_LI, ymax = RR_LS), position = position_dodge(width=0.9), width = 0.25) +
-  facet_grid(~ Region) +
-  labs(x = "Age group", y = "Risk Ratio (RR)") +
-  theme(legend.position="bottom") +
-  scale_fill_manual(values = c("#3399FF", "#FF6666"))
-
-  ggsave(plot = figura3, "figuras/Figura 3.png", width=6, height=4, dpi=300)
-
-# Por Região (Figura 4 do repositório)
-
-figura4 = ggplot(RRfinal, aes(x = factor(RRfinal$`Grupo etário`, levels = c("25 a 29 anos", "30 a 34 anos", "35 a 39 anos",
-                                                                  "40 a 44 anos", "45 a 49 anos", "50 a 54 anos",
-                                                                  "55 a 59 anos" ),
-                               labels = c("1", "2", "3", "4", "5", "6", "7")), y = RR_média, fill = Region)) +
-  geom_col(position = position_dodge(width=0.9)) +
-  geom_errorbar(aes(ymin = RR_LI, ymax = RR_LS), position = position_dodge(width=0.9), width = 0.25) +
-  facet_grid(~ Sex) +
-  labs(x = "Age group", y = "Risc Ratio (RR)") +
-  theme(legend.position="bottom") +
-  scale_fill_brewer(palette="Paired")
-
-  ggsave(plot = figura4, "figuras/Figura 4.png", width=6, height=4, dpi=300)
-
-
-  # Automatizando o cálculo de 35q25 para cada recorte ----------------------------------
+# Automatizando o cálculo de 35q25 para cada recorte ----------------------------------
 
 mort = df4[df4$`Grupo etário` == "25 a 29 anos",2:4]
 mort$LS_35q25 = mort$LI_35q25 = mort$média_35q25 = NA
@@ -244,7 +200,7 @@ for (regiao in Regiao) {
 write.xlsx2(mort, '35q25_COM_CORR.xlsx', sheetName="35q25",
             col.names=TRUE, row.names = FALSE)
 
-#######Gráficos 35q25 (Figura A1 do repositório)
+#######Gráficos 35q25 (Figura 2 do repositório)
 
 ############################ Alterando as categorias para o inglês
 
@@ -255,7 +211,7 @@ mort <- mort %>%
 
 
 
-A1 = ggplot(mort, aes(Sex, média_35q25, fill = `Level of education`)) +
+figura2 = ggplot(mort, aes(Sex, média_35q25, fill = `Level of education`)) +
   geom_col(position = position_dodge(width=0.9)) +
   geom_errorbar(aes(ymin = LI_35q25, ymax = LS_35q25), position = position_dodge(width=0.9), width = 0.25) +
   facet_grid(~ Region) +
@@ -263,7 +219,53 @@ A1 = ggplot(mort, aes(Sex, média_35q25, fill = `Level of education`)) +
   # ggtitle("A1: Probabilidade de morte dos 25 aos 59 anos (35q25) por sexo, segundo as regiões, 2010. ") +
   theme(axis.text.x = element_text(angle = 90, hjust = 1), legend.position="bottom") 
 
-ggsave(plot = A1, "figuras/Figura A1.png", width=6, height=4, dpi=300)
+ggsave(plot = figura2, "figuras/Figura2.eps", width=6, height=4, dpi=300)
+
+# Por IDADE (Figura 3 do repositório)
+
+figura3 = ggplot(RRfinal, aes(x = factor(RRfinal$`Grupo etário`, levels = c("25 a 29 anos", "30 a 34 anos", "35 a 39 anos",
+                                                              "40 a 44 anos", "45 a 49 anos", "50 a 54 anos",
+                                                              "55 a 59 anos" ),
+                                         labels = c("25-29", "30-34", "35-39", "40-44", "45-49", "50-54", "55-59")), y = RR_média)) +
+  geom_col(position = position_dodge(width=0.9)) +
+  geom_errorbar(aes(ymin = RR_LI, ymax = RR_LS), position = position_dodge(width=0.9), width = 0.25) +
+  facet_grid(Sex ~ Region) +
+  labs(x = "Age group", y = "Risc Ratio (RR)") +
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
+
+  ggsave(plot = figura3, "figuras/Figura 3.eps", width=6, height=4, dpi=300)
+
+# Por SEXO (Figura 4 do repositório)
+
+figura4 = ggplot(RRfinal, aes(x = factor(RRfinal$`Grupo etário`, levels = c("25 a 29 anos", "30 a 34 anos", "35 a 39 anos",
+                                                              "40 a 44 anos", "45 a 49 anos", "50 a 54 anos",
+                                                              "55 a 59 anos" ),
+                                         labels = c("25-29", "30-34", "35-39", "40-44", "45-49", "50-54", "55-59")), y = RR_média, fill = Sex)) +
+  geom_col(position = position_dodge(width=0.9)) +
+  geom_errorbar(aes(ymin = RR_LI, ymax = RR_LS), position = position_dodge(width=0.9), width = 0.25) +
+  facet_grid(~ Region) +
+  labs(x = "Age group", y = "Risk Ratio (RR)") +
+  theme(legend.position="bottom", axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1)) +
+  scale_fill_manual(values = c("#3399FF", "#FF6666"))
+
+  ggsave(plot = figura4, "figuras/Figura 4.eps", width=6, height=4, dpi=300)
+
+# Por Região (Figura 4 do repositório)
+
+figura5 = ggplot(RRfinal, aes(x = factor(RRfinal$`Grupo etário`, levels = c("25 a 29 anos", "30 a 34 anos", "35 a 39 anos",
+                                                                  "40 a 44 anos", "45 a 49 anos", "50 a 54 anos",
+                                                                  "55 a 59 anos" ),
+                                         labels = c("25-29", "30-34", "35-39", "40-44", "45-49", "50-54", "55-59")), y = RR_média, fill = Region)) +
+  geom_col(position = position_dodge(width=0.9)) +
+  geom_errorbar(aes(ymin = RR_LI, ymax = RR_LS), position = position_dodge(width=0.9), width = 0.25) +
+  facet_grid(~ Sex) +
+  labs(x = "Age group", y = "Risc Ratio (RR)") +
+  theme(legend.position="bottom", axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1)) +
+  scale_fill_brewer(palette="Paired")
+
+  ggsave(plot = figura5, "figuras/Figura 5.eps", width=6, height=4, dpi=300)
+
+
 
 # Calculando a razão de probabilidade (RP = 35q25(baixa) / 35q25(alta) ----------------------------------
 
@@ -300,9 +302,9 @@ RPfinal <- RPfinal %>%
          Region = factor(Região, levels = c("Brasil", "Centro-oeste", "Nordeste", "Norte", "Sudeste", "Sul"), labels = c("Brazil", "Midwest", "Northeast", "North", "Southeast", "South"))
   )
 
-# Por SEXO (Figura A2 do repositório)
+# Por SEXO (Figura A1 do repositório)
 
-A2 = ggplot(RPfinal, aes(Sex, RP_média)) +
+A1 = ggplot(RPfinal, aes(Sex, RP_média)) +
   geom_col(position = position_dodge(width=0.9)) +
   geom_errorbar(aes(ymin = RP_LI, ymax = RP_LS), position = position_dodge(width=0.9), width = 0.25) +
   facet_grid(~ Region) +
@@ -310,18 +312,18 @@ A2 = ggplot(RPfinal, aes(Sex, RP_média)) +
   labs(y = "Probability ratio (PR)")
   # ggtitle("A2: Razão de probabilidade (RP) por sexo, segundo as regiões, 2010.")
 
-ggsave(plot = A2, "figuras/Figura A2.png", width=6, height=4, dpi=300)
+ggsave(plot = A1, "figuras/Figura A1.eps", width=6, height=4, dpi=300)
 
 # Por região (Figura A3 do repositório)
-A3 = ggplot(RPfinal, aes(Sex, RP_média, fill = Region)) +
+A2 = ggplot(RPfinal, aes(Sex, RP_média, fill = Region)) +
   geom_col(position = position_dodge(width=0.9)) +
   geom_errorbar(aes(ymin = RP_LI, ymax = RP_LS), position = position_dodge(width=0.9), width = 0.25) +
   labs(y = "Probability ratio (PR)") +
   theme(legend.position = "bottom") +
   scale_fill_brewer(palette="Paired") 
-  # ggtitle("A3: Razão de probabilidade (RP) por região, segundo o sexo, 2010.")
+  # ggtitle("A2: Razão de probabilidade (RP) por região, segundo o sexo, 2010.")
 
-ggsave(plot = A3, "figuras/Figura A3.png", width=6, height=4, dpi=300)
+ggsave(plot = A2, "figuras/Figura A2.eps", width=6, height=4, dpi=300)
 
 
 # # Figura 5 do repositório - Unindo A1, A2 e A3
